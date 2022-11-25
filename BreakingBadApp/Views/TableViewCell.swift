@@ -14,10 +14,11 @@ final class TableViewCell: UITableViewCell {
     private var imageMain: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.cornerRadius = 50
-        imageView.layer.borderWidth = 2
-        imageView.layer.borderColor = UIColor.systemGray3.cgColor
+        imageView.layer.cornerRadius = 40
+        imageView.layer.borderWidth = 3
+        imageView.layer.borderColor = UIColor.black.cgColor
         imageView.clipsToBounds = true
+        imageView.contentMode = .scaleToFill
         return imageView
     }()
     
@@ -51,7 +52,7 @@ final class TableViewCell: UITableViewCell {
     
     func configure(from character: Character) {
         firstLabel.text = character.name
-        secondLabel.text = character.portrayed
+        secondLabel.text = character.nickname
         NetworkManager.share.fetchImage(from: character.img) { result in
             switch result {
             case .success(let image):
@@ -67,10 +68,11 @@ final class TableViewCell: UITableViewCell {
     private func setupLayout() {
         [imageMain, firstLabel, secondLabel] .forEach { contentView.addSubview($0) }
         NSLayoutConstraint.activate([
-            imageMain.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageMain.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
             imageMain.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            imageMain.widthAnchor.constraint(equalToConstant: 100),
-            imageMain.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            imageMain.widthAnchor.constraint(equalToConstant: 80),
+            imageMain.heightAnchor.constraint(equalToConstant: 80),
+            imageMain.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor),
             
             firstLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             firstLabel.leadingAnchor.constraint(equalTo: imageMain.trailingAnchor, constant: 16),

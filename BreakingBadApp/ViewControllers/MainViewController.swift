@@ -9,9 +9,18 @@ import UIKit
 
 final class MainViewController: UIViewController {
     
-//MARK: - Private properties
+    //MARK: - Private properties
     
-    private var character: [Character] = []
+    private var charModel: [Character] = []
+    private var filteredCharacters: [Character] = []
+    private let searchController = UISearchController(searchResultsController: nil)
+    private var searchBarIsEmpty: Bool {
+        guard let text = searchController.searchBar.text else { return false }
+        return text.isEmpty
+    }
+    private var isFiltering: Bool {
+        return searchController.isActive && !searchBarIsEmpty
+    }
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
@@ -21,18 +30,18 @@ final class MainViewController: UIViewController {
         tableView.register(TableViewCell.self, forCellReuseIdentifier: TableViewCell.identifier)
         return tableView
     }()
-
-//MARK: - Override methods
+    
+    //MARK: - Override methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigationBar()
-        tableView.rowHeight = 100
         setupLayout()
         fetchData()
+        setupSearchBar()
     }
-
-//MARK: - Private functions
+    
+    //MARK: - Private functions
     
     private func setupLayout() {
         view.addSubview(tableView)
@@ -47,9 +56,18 @@ final class MainViewController: UIViewController {
     
     private func fetchData() {
         NetworkManager.share.fetchData(from: Link.BreakingBadAPI.rawValue) { [unowned self] character in
-            self.character = character
+            charModel = character
             tableView.reloadData()
         }
+    }
+    
+    private func setupSearchBar() {
+        navigationItem.searchController = searchController
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.barTintColor = .white
+        definesPresentationContext = true
+        
     }
 }
 
@@ -58,12 +76,12 @@ final class MainViewController: UIViewController {
 extension MainViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        character.count
+        isFiltering ? filteredCharacters.count : charModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCell.identifier, for: indexPath) as? TableViewCell else { return TableViewCell()}
-        let character = character[indexPath.row]
+        let character = isFiltering ? filteredCharacters[indexPath.row] : charModel[indexPath.row]
         cell.configure(from: character)
         cell.selectionStyle = .none
         return cell
@@ -73,8 +91,15 @@ extension MainViewController: UITableViewDataSource {
 //MARK: - UiTableViewDelegate
 
 extension MainViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let discrVC = DescriptionViewController()
+        let charModel = isFiltering ? filteredCharacters[indexPath.row] : charModel[indexPath.row]
+        discrVC.configure(from: charModel)
+        navigationController?.pushViewController(discrVC, animated: true)
+    }
 }
+
+//MARK: - UiNavigationBar
 
 extension MainViewController {
     
@@ -89,5 +114,21 @@ extension MainViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
         
         navigationController?.navigationBar.tintColor = .black
+    }
+}
+
+//MARK: - UiSearchResultsUptading
+
+extension MainViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContent(searchText: searchController.searchBar.text ?? "")
+    }
+    
+    func filterContent(searchText: String) {
+        filteredCharacters = charModel.filter({ character in
+            character.name.lowercased().contains(searchText.lowercased())
+        })
+        
+        tableView.reloadData()
     }
 }
