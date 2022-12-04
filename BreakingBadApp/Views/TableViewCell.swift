@@ -11,15 +11,25 @@ final class TableViewCell: UITableViewCell {
     
     //MARK: - Private properties
     
+    private var imageUrl: URL? {
+        didSet {
+            imageMain.image = nil
+        }
+    }
+    
     private var imageMain: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 40
-        imageView.layer.borderWidth = 3
-        imageView.layer.borderColor = UIColor.black.cgColor
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleToFill
         return imageView
+    }()
+    
+    private var activityCircle: UIActivityIndicatorView = {
+        let activityCircle = UIActivityIndicatorView()
+        activityCircle.translatesAutoresizingMaskIntoConstraints = false
+        activityCircle.startAnimating()
+        return activityCircle
     }()
     
     private let firstLabel: UILabel = {
@@ -42,6 +52,7 @@ final class TableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
+       
     }
     
     required init?(coder: NSCoder) {
@@ -53,12 +64,17 @@ final class TableViewCell: UITableViewCell {
     func configure(from character: Character) {
         firstLabel.text = character.name
         secondLabel.text = character.nickname
-        NetworkManager.share.fetchImage(from: character.img) { result in
-            switch result {
-            case .success(let image):
-                self.imageMain.image = UIImage(data: image)
-            case .failure(let error):
-                print(error)
+        imageUrl = URL(string: character.img)
+        guard let imageUrl = imageUrl else { return }
+        NetworkManager.share.fetchImage(from: imageUrl) { [unowned self] result in
+            if imageUrl == self.imageUrl {
+                switch result {
+                case .success(let image):
+                    imageMain.image = UIImage(data: image)
+                    activityCircle.stopAnimating()
+                case .failure(let error):
+                    print(error)
+                }
             }
         }
     }
@@ -66,13 +82,16 @@ final class TableViewCell: UITableViewCell {
     //MARK: - Private functions
     
     private func setupLayout() {
-        [imageMain, firstLabel, secondLabel] .forEach { contentView.addSubview($0) }
+        [imageMain, activityCircle, firstLabel, secondLabel] .forEach { contentView.addSubview($0) }
         NSLayoutConstraint.activate([
-            imageMain.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
+            imageMain.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             imageMain.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             imageMain.widthAnchor.constraint(equalToConstant: 80),
             imageMain.heightAnchor.constraint(equalToConstant: 80),
-            imageMain.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor),
+            imageMain.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            
+            activityCircle.centerYAnchor.constraint(equalTo: imageMain.centerYAnchor),
+            activityCircle.centerXAnchor.constraint(equalTo: imageMain.centerXAnchor),
             
             firstLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             firstLabel.leadingAnchor.constraint(equalTo: imageMain.trailingAnchor, constant: 16),

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B77149E9292ECF7900160A82 /* DescriptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77149E8292ECF7900160A82 /* DescriptionViewController.swift */; };
+		B79A95B2293B0B8000F31DF4 /* ImageCatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79A95B1293B0B8000F31DF4 /* ImageCatchManager.swift */; };
 		B7BBDBE6292C3D4B00CCBDFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BBDBE5292C3D4B00CCBDFB /* AppDelegate.swift */; };
 		B7BBDBE8292C3D4B00CCBDFB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BBDBE7292C3D4B00CCBDFB /* SceneDelegate.swift */; };
 		B7BBDBEA292C3D4B00CCBDFB /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BBDBE9292C3D4B00CCBDFB /* MainViewController.swift */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		B77149E8292ECF7900160A82 /* DescriptionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionViewController.swift; sourceTree = "<group>"; };
+		B79A95B1293B0B8000F31DF4 /* ImageCatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCatchManager.swift; sourceTree = "<group>"; };
 		B7BBDBE2292C3D4B00CCBDFB /* BreakingBadApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreakingBadApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BBDBE5292C3D4B00CCBDFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B7BBDBE7292C3D4B00CCBDFB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				B7BBDBFF292C42CB00CCBDFB /* NetworkManager.swift */,
+				B79A95B1293B0B8000F31DF4 /* ImageCatchManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 				B7BBDC06292C48DA00CCBDFB /* UiView.swift in Sources */,
 				B7BBDBEA292C3D4B00CCBDFB /* MainViewController.swift in Sources */,
 				B7BBDBE6292C3D4B00CCBDFB /* AppDelegate.swift in Sources */,
+				B79A95B2293B0B8000F31DF4 /* ImageCatchManager.swift in Sources */,
 				B7BBDC00292C42CB00CCBDFB /* NetworkManager.swift in Sources */,
 				B7BBDC04292C479600CCBDFB /* TableViewCell.swift in Sources */,
 				B77149E9292ECF7900160A82 /* DescriptionViewController.swift in Sources */,

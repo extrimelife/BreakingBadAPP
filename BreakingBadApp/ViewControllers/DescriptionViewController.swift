@@ -11,33 +11,42 @@ final class DescriptionViewController: UIViewController {
     
     //MARK: - Private properties
     
+    private var imageUrl: URL? {
+        didSet {
+            imageLabel.image = nil
+        }
+    }
+    
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.startAnimating()
+        return indicator
+    }()
+    
     private let imageLabel: UIImageView = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.layer.cornerRadius = 118
-        image.layer.borderWidth = 3
-        image.layer.borderColor = UIColor.black.cgColor
+        image.layer.cornerRadius = 100
         image.clipsToBounds = true
+        image.sizeToFit()
         return image
     }()
     
     private lazy var birthdayLabel: UILabel = {
-        setupLabels()
+        setupLabel()
     }()
     
     private lazy var statusLabel: UILabel = {
-        setupLabels()
+        setupLabel()
     }()
     
     private lazy var occupationLabel: UILabel = {
-        setupLabels()
+        setupLabel()
     }()
     
-    private let nameLabel: UILabel = {
-        let name = UILabel()
-        name.translatesAutoresizingMaskIntoConstraints = false
-        name.font = UIFont.systemFont(ofSize: 18, weight: .regular)
-        return name
+    private lazy var nameLabel: UILabel = {
+        setupLabel()
     }()
     
     //MARK: - Override methods
@@ -45,7 +54,7 @@ final class DescriptionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-        title = nameLabel.text
+       
     }
     
     //MARK: - Public methods
@@ -55,19 +64,25 @@ final class DescriptionViewController: UIViewController {
         occupationLabel.text = "\u{231B}" + "\(character.occupation[0])"
         statusLabel.text =  "\u{1F3C6}"   +   "\(character.status)"
         birthdayLabel.text = "\u{1F382}" + "\(character.birthday)"
-        NetworkManager.share.fetchImage(from: character.img) {[unowned self] result in
-            switch result {
-            case .success(let image):
-                imageLabel.image = UIImage(data: image)
-            case .failure(let error):
-                print(error)
+        title = character.name
+        imageUrl = URL(string: character.img)
+        guard let imageUrl = imageUrl else { return }
+        NetworkManager.share.fetchImage(from: imageUrl) {[unowned self] result in
+            if imageUrl == self.imageUrl {
+                switch result {
+                case .success(let image):
+                    imageLabel.image = UIImage(data: image)
+                    activityIndicator.stopAnimating()
+                case .failure(let error):
+                    print(error)
+                }
             }
         }
     }
     
 //MARK: Private methods
     
-    private func setupLabels() -> UILabel {
+    private func setupLabel() -> UILabel {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 18, weight: .regular)
@@ -76,13 +91,16 @@ final class DescriptionViewController: UIViewController {
     
     private func setupLayout() {
         view.backgroundColor = .white
-        [imageLabel, birthdayLabel, statusLabel, occupationLabel, nameLabel] .forEach { view.addSubview($0) }
+        [imageLabel, activityIndicator, birthdayLabel, statusLabel, occupationLabel, nameLabel] .forEach { view.addSubview($0) }
         
         NSLayoutConstraint.activate([
             imageLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             imageLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageLabel.heightAnchor.constraint(equalToConstant: 270),
-            imageLabel.widthAnchor.constraint(equalToConstant: 240),
+            imageLabel.heightAnchor.constraint(equalToConstant: 200),
+            imageLabel.widthAnchor.constraint(equalToConstant: 200),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: imageLabel.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: imageLabel.centerYAnchor),
             
             nameLabel.topAnchor.constraint(equalTo: imageLabel.bottomAnchor, constant: 20),
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
